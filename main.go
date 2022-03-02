@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 var f = flag.String("f", "", "-f=111.log")
@@ -38,6 +39,21 @@ func main() {
 	}
 }
 
+func removeFiles(patten string) {
+	var dir = filepath.Dir(patten)
+	var files, _ = ioutil.ReadDir(dir)
+	for _, v := range files {
+
+		if v.IsDir() {
+			continue
+		}
+
+		if strings.HasPrefix(v.Name(), patten) {
+			os.Remove(v.Name())
+		}
+	}
+}
+
 func SplitFileByLine(file string, lines int) {
 	var fileName = file
 	var ext = filepath.Ext(file)
@@ -50,6 +66,7 @@ func SplitFileByLine(file string, lines int) {
 	}
 
 	// 删掉旧文件
+	removeFiles(file + ".part.")
 
 
 	fi, err := os.Open(fileName)
@@ -100,6 +117,7 @@ func SplitFileByByteCount(file string, rawMaxSize int) {
 	}
 
 	// 删掉旧文件
+	removeFiles(file + ".part.")
 
 
 	fi, err := os.Open(fileName)
